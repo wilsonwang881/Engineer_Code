@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
-
+#include "../BSP/Buzzer/buzzer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,10 +55,10 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128
 };
-/* Definitions for Power_On_Tune */
-osThreadId_t Power_On_TuneHandle;
-const osThreadAttr_t Power_On_Tune_attributes = {
-  .name = "Power_On_Tune",
+/* Definitions for LED_G_Blink */
+osThreadId_t LED_G_BlinkHandle;
+const osThreadAttr_t LED_G_Blink_attributes = {
+  .name = "LED_G_Blink",
   .priority = (osPriority_t) osPriorityLow,
   .stack_size = 128
 };
@@ -69,8 +69,9 @@ const osThreadAttr_t Power_On_Tune_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-void Power_On_Tune_Entry(void *argument);
+void LED_G_Blink_Entry(void *argument);
 
+extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -101,10 +102,10 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of Power_On_Tune */
-  Power_On_TuneHandle = osThreadNew(Power_On_Tune_Entry, NULL, &Power_On_Tune_attributes);
+  /* creation of LED_G_Blink */
+  LED_G_BlinkHandle = osThreadNew(LED_G_Blink_Entry, NULL, &LED_G_Blink_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -121,31 +122,37 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+//  for(;;)
+//  {
+//    //HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+//    osDelay(500);
+//  }
   /* USER CODE END StartDefaultTask */
 }
 
-/* USER CODE BEGIN Header_Power_On_Tune_Entry */
+/* USER CODE BEGIN Header_LED_G_Blink_Entry */
 /**
-* @brief Function implementing the Power_On_Tune thread.
+* @brief Function implementing the LED_G_Blink thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_Power_On_Tune_Entry */
-void Power_On_Tune_Entry(void *argument)
+/* USER CODE END Header_LED_G_Blink_Entry */
+void LED_G_Blink_Entry(void *argument)
 {
-  /* USER CODE BEGIN Power_On_Tune_Entry */
+  /* USER CODE BEGIN LED_G_Blink_Entry */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+		HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
+    osDelay(500);
+		HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+    osDelay(500);
   }
-  /* USER CODE END Power_On_Tune_Entry */
+  /* USER CODE END LED_G_Blink_Entry */
 }
 
 /* Private application code --------------------------------------------------*/
